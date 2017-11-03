@@ -2,22 +2,28 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation
 {
-	private WeightedQuickUnionUF backwash;	
+	private WeightedQuickUnionUF backwash;
+	private WeightedQuickUnionUF union;
 	private boolean[] grid;
 	private final int SIZE, BOTTOM_INDEX, TOP_INDEX;
 	private int NO_SITES_OPEN;
 
 	public Percolation(int size)
 	{
-		backwash = new WeightedQuickUnionUF(size * size + 2);
-		grid = new boolean[size * size];
 		SIZE = size;
+		assertGridSize(size, size);
+		
+		
+		backwash = new WeightedQuickUnionUF(size * size + 2);
+		union = new WeightedQuickUnionUF(size * size + 2);
+		grid = new boolean[size * size];		
 		BOTTOM_INDEX = size * size + 1; 
 		TOP_INDEX = size * size;	
 	}
 	
 	public boolean isOpen(int row, int col)
 	{
+		assertGridSize(row, col);
 		return grid[getIndex(row, col)];
 	}
 	
@@ -44,23 +50,28 @@ public class Percolation
 		
 	}
 	
-	public boolean percolates() {return backwash.connected(TOP_INDEX, BOTTOM_INDEX);}
+	
+	
+	public boolean percolates() {return union.connected(TOP_INDEX, BOTTOM_INDEX);}
 	
     public boolean isFull(int row, int col) {
         assertGridSize(row, col);
         return backwash.connected(getIndex(row, col), TOP_INDEX);
     }
 	
-	private void union(int x, int y) {backwash.union(x,y);}
+	private void union(int x, int y) {
+		backwash.union(x,y);
+		union.union(x, y);
+	}
 	
 	private void connectTopRowSite(int row, int col)
 	{
-		if (row == 1)union(TOP_INDEX, getIndex(row, col));
+		if (row == 1) union(TOP_INDEX, getIndex(row, col));
 	}
 	
 	private void connectBottomRowSite(int row, int col)
 	{
-		if (row == SIZE) union(BOTTOM_INDEX, getIndex(row,col));
+		if (row == SIZE) union.union(BOTTOM_INDEX, getIndex(row,col));
 	}
 	
 	private void connectAboveSite(int row, int col)
@@ -68,7 +79,7 @@ public class Percolation
 		if (row > 1 && isOpen(row-1, col)) 
 		{
 			union(getIndex(row-1, col), getIndex(row, col));
-		}		
+        }		
 	}
 	
 	private void connectBelowSite(int row, int col)
@@ -102,16 +113,18 @@ public class Percolation
 			throw new IllegalArgumentException();
 	}
 	
+	
+	
 	public static void main(String[] args)
 	{
-		System.out.println("Randomly Testing a 4X4 Grid wheter it percolates.");
-		Percolation per = new Percolation(4);
-		per.open(1,2);
-		per.open(2,2);
-		per.open(2,3);
-		per.open(3,3);
-		per.open(4, 4);
-		per.open(4, 3);
-		System.out.println(per.percolates());
+		System.out.println("Randomly Testing a 3X3 Grid wheter it percolates.");
+		Percolation per = new Percolation(3);
+		
+		per.open(1,3);		
+		per.open(2,3);		
+		per.open(3,3);		
+		per.open(3,1);
+		
+		System.out.println(per.isFull(3,1));
 	}
 }
