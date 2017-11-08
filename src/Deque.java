@@ -91,8 +91,8 @@ public class Deque<Item> implements Iterable<Item>
 	}
 	
 	
-	public void assertNotNull(Item item){if (item == null) throw new IllegalArgumentException();}
-	public void assertNotEmpty() { if (isEmpty()) throw new NoSuchElementException();}
+	private void assertNotNull(Item item){if (item == null) throw new IllegalArgumentException();}
+	private void assertNotEmpty() { if (isEmpty()) throw new NoSuchElementException();}
 	//public void assertNonRemove() { throw new UnsupportedOperationException();}
 	
 	
@@ -105,7 +105,9 @@ public class Deque<Item> implements Iterable<Item>
 		private Node current = first;
 		public boolean hasNext() { return current != null;}
 		public void remove() { throw new UnsupportedOperationException();}
-		public Item next() {Item item = current.item; current = current.next; return item;}		
+		public Item next() { 
+		if (current == null)  throw new NoSuchElementException();
+		Item item = current.item; current = current.next; return item;}		
 	}
 	
 	public static void main(String[] args)
